@@ -1,2 +1,7 @@
-package com.learnkafka.Entity;public class LibraryEventType {
+package com.learnkafka.Entity;
+
+public enum LibraryEventType {
+    NEW,
+    UPDATE
 }
+

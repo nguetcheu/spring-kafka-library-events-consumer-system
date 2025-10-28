@@ -1,2 +1,4 @@
-package com.learnkafka.Repository;public class LibraryEventsRepository {
+package com.learnkafka.Repository;
+
+public class LibraryEventsRepository {
 }

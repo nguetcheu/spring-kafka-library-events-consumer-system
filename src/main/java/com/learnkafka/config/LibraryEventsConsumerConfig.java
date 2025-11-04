@@ -1,5 +1,6 @@
 package com.learnkafka.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
@@ -12,12 +13,21 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.util.backoff.FixedBackOff;
 
 @Configuration
-// @EnableKafka
+@EnableKafka
+@Slf4j
 public class LibraryEventsConsumerConfig {
 
     private final KafkaProperties properties;
+
+    public DefaultErrorHandler errorHandler(){
+
+        var fixedBackOff = new FixedBackOff(1000L, 2);
+        return new DefaultErrorHandler(fixedBackOff);
+    }
 
     public LibraryEventsConsumerConfig(KafkaProperties properties) {
         this.properties = properties;
@@ -31,6 +41,7 @@ public class LibraryEventsConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         configurer.configure(factory, kafkaConsumerFactory
                 .getIfAvailable(() -> new DefaultKafkaConsumerFactory<>(this.properties.buildConsumerProperties())));
+        factory.setCommonErrorHandler(errorHandler());
         //factory.setConcurrency(3);
         // factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;

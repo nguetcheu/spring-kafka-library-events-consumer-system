@@ -31,10 +31,15 @@ public class LibraryEventsConsumerConfig {
                 IllegalArgumentException.class
         );
 
+        var exceptionToRetrylist = List.of(
+                IllegalArgumentException.class
+        );
+
         var fixedBackOff = new FixedBackOff(1000L, 2);
         var errorHandler = new DefaultErrorHandler(fixedBackOff);
 
-        exceptionToIgnorelist.forEach(errorHandler::addNotRetryableExceptions);
+        // exceptionToIgnorelist.forEach(errorHandler::addNotRetryableExceptions);
+        exceptionToRetrylist.forEach(errorHandler::addRetryableExceptions);
         errorHandler.setRetryListeners(((record, ex, deliveryAttempt) -> {
             log.info("Failed Record in Retry Listener, Exception : {}, deliveryAttempt : {}", ex.getMessage(), deliveryAttempt);
         }));
